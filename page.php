@@ -9,16 +9,24 @@
 	//kysime ainult tunde
 	$hour_now = date("H");
 	$day_category = "tavaline päev" ;
-	if($weekday_now <= 5){$day_category="koolipäev";}	//< > == === !=
-	else {$day_category="puhkepäev";}
-		if($day_category="koolipäev")
-			if($hour_now < 8){$time_category="uneaeg";}
-			elseif($hour_now > 8 and < 15){$time_category="kooliaeg";}
-			else {$time_category="puhkeaeg";}
-		else
-			if($hour_now < 10){$time_category="uneaeg";}
-			elseif($hour_now > 10 and < 16){$time_category="kodutööaeg";}
-			else {$time_category="puhkeaeg";}
+	if($weekday_now <= 5){
+		$day_category="koolipäev";
+		
+	}	//< > == === !=
+	else {
+		$day_category="puhkepäev";
+		
+	}
+	if($day_category == "koolipäev")
+		if($hour_now < 8){$time_category="uneaeg";}
+		elseif($hour_now > 8 and $hour_now < 15){$time_category="kooliaeg";}
+		else {$time_category == "puhkeaeg";}
+	else{
+		if($hour_now < 10){$time_category="uneaeg";}
+		elseif($hour_now > 10 and $hour_now < 16){$time_category="kodutööaeg";}
+		else {$time_category="puhkeaeg";
+	}
+	}
 	
 	//Lisan lehele juhusliku foto
 	$photo_dir = "photos/";
