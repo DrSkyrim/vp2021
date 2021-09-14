@@ -17,7 +17,7 @@
 			else {$time_category="puhkeaeg";}
 		else
 			if($hour_now < 10){$time_category="uneaeg";}
-			elseif($hour_now < 10 and < 16){$time_category="kodutööaeg";}
+			elseif($hour_now > 10 and < 16){$time_category="kodutööaeg";}
 			else {$time_category="puhkeaeg";}
 	
 	//Lisan lehele juhusliku foto
