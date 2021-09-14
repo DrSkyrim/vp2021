@@ -20,7 +20,8 @@
 	if($day_category == "koolipäev")
 		if($hour_now < 8){$time_category="uneaeg";}
 		elseif($hour_now > 8 and $hour_now < 15){$time_category="kooliaeg";}
-		else {$time_category == "puhkeaeg";}
+		else {$time_category == "puhkeaeg";
+		}
 	else{
 		if($hour_now < 10){$time_category="uneaeg";}
 		elseif($hour_now > 10 and $hour_now < 16){$time_category="kodutööaeg";}
