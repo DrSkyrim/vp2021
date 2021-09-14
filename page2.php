@@ -57,6 +57,13 @@
 		$photo_list_html .= "<li>" .$all_photos[$i]."</li> \n";
 	} 
 	$photo_list_html .= "</ul> \n" ;
+	
+	
+	$photo_select_html = '<select name="photo_select">'."\n";
+		for($i = 0; $i < $file_count; $i ++){
+		$photo_select_html .= '<option value=""'. $i .'">'.$all_photos[$i]."</option> \n";
+		}
+	$photo_select_html .= "</select>";
 ?>
 <!DOCTYPE html>
 <html lang="et">
@@ -78,6 +85,8 @@
 				</form>
 				<?php echo $today_html; ?>
 				<hr>
+				<form method="post">
+				<?php echo $photo_select_html?>
 				<?php echo $photo_html; 
 				echo $photo_list_html;?>
 </body>
