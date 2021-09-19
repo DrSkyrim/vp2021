@@ -58,6 +58,15 @@
 	} 
 	$photo_list_html .= "</ul> \n" ;
 	
+		if(isset($_POST['submit_photo_select'])){
+        if(!empty($_POST['photo_select_html'])){
+            $pic_choice_num = $_POST['photo_select_html'];
+            $pic_choice_num ++;
+            $pic_choice_file = $photo_files[$pic_choice_num];
+            $pic_choice_html = '<img src="' . $photo_dir . $pic_choice_file . '"alt="Pilt TLÜ õppehoonest">';
+        }
+    }
+	
 	
 	$photo_select_html = '<select name="photo_select">'."\n";
 		for($i = 0; $i < $file_count; $i ++){
@@ -87,6 +96,7 @@
 				<hr>
 				<form method="post">
 				<?php echo $photo_select_html?>
+				<input type="submit" name="submit_photo_select" value="Saada ära">
 				<?php echo $photo_html; 
 				echo $photo_list_html;?>
 </body>
