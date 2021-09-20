@@ -1,103 +1,89 @@
 <?php
-	 $author_name = "Martin Lukas";
-	 //vaatan mida post meetodil saadeti
-	 //var_dump($_POST);
-	 
-	 $today_html = null;
-	 $today_adjective_error = null;
- 	 $todays_adjective = null;
-	 //kontrollin ka klikiti submit
-	 if(isset($_POST["submit_todays_adjective"])){
-	 //echo "Klikiti nuppu";
-		if(!empty($_POST["todays_adjective_input"])){
-		$today_html = "<p> Tänane päev on " .$_POST["todays_adjective_input"].".</p>";
-		$todays_adjective = $_POST["todays_adjective_input"];
-		} else {
-			$today_adjective_error = "Palun kirjutage tänase ilma kohta omadussõna";
-		}
-	 }
-	 
-//lisan lehele juhusliku foto
-	$photo_dir = "photos/";
-	//loen kataloogi sisu
-	//$all_files = scandir($photo_dir);
-	$all_files = array_slice(scandir($photo_dir), 2);
-	//echo $all_files;
-	//var_dump($all_files);
+	$author_name = "Martin Lukas";
 	
-	//kontrollin ja võtan ainult fotod
+	$todays_evaluation = null;
+	$inserted_adjective = null;
+	$adjective_error = null;
+	
+	if(isset($_POST["todays_adjective_input"])){
+		if(!empty($_POST["adjective_input"])){
+			$todays_evaluation = "<p>Tänane päev on <strong>" . $_POST["adjective_input"] . "</strong>.</p><hr>";
+			$inserted_adjective = $_POST["adjective_input"];
+		}
+		else{
+			$adjective_error = "Palun kirjuta tänase päeva kohta sobiv omadussõna";
+		}
+	}
+	
+	$photo_dir = "photos/";
 	$allowed_photo_types = ["image/jpeg", "image/png"];
-	$all_photos = [];
+	$all_files = array_slice(scandir($photo_dir), 2);
+	
+	$photo_files = [];
 	foreach($all_files as $file){
-		$file_info = getimagesize($photo_dir .$file);
+		$file_info = getimagesize($photo_dir . $file);
 		if(isset($file_info["mime"])){
 			if(in_array($file_info["mime"], $allowed_photo_types)){
-				array_push($all_photos, $file);
-			}//if in_array lõppeb
-		}//if isset lõppeb
-	}//foreach lõppeb
-	
-	$file_count = count($all_photos);
-	$photo_num = mt_rand(0, $file_count - 1);
-	//echo $photo_num;
-	//<img src="photos/pilt.jpg" alt="Tallinna Ülikool">
-	$photo_html = '<img src="' .$photo_dir .$all_photos[$photo_num] .'" alt="Tallinna Ülikool">';
-	$photo_list_html="<ul> \n";
-	
-	//tsükkel
-	//for($i=algväärtus; $i < piirväärtus; $i muutumine){....}
-	//$i=$i+5
-	//$i+=5
-	//<ul>
-	//<li> pildifail.jpg</li>
-	//...
-	//<li> pildifailN.jpg</li>
-	//</ul>
-	for($i = 0; $i < $file_count; $i ++){
-		$photo_list_html .= "<li>" .$all_photos[$i]."</li> \n";
-	} 
-	$photo_list_html .= "</ul> \n" ;
-	
-		if(isset($_POST['submit_photo_select'])){
-        if(!empty($_POST['photo_select_html'])){
-            $pic_choice_num = $_POST['photo_select_html'];
-            $pic_choice_num ++;
-            $pic_choice_file = $photo_files[$pic_choice_num];
-            $pic_choice_html = '<img src="' . $photo_dir . $pic_choice_file . '"alt="Pilt TLÜ õppehoonest">';
-        }
-    }
-	
-	
-	$photo_select_html = '<select name="photo_select">'."\n";
-		for($i = 0; $i < $file_count; $i ++){
-		$photo_select_html .= '<option value=""'. $i .'">'.$all_photos[$i]."</option> \n";
+				array_push($photo_files, $file);
+			}
 		}
-	$photo_select_html .= "</select>";
+	}
+	
+	$limit = count($photo_files);
+	if (isset($_POST["photo_select"])){
+		$pic_num = $_POST["photo_select"];
+	}
+	else{
+		$pic_num = mt_rand(0, $limit - 1);
+	}
+	
+	$pic_file = $photo_files[$pic_num];
+	$pic_html = '<img src="' . $photo_dir . $pic_file . '" alt="Tallinna Ülikool"><p>' . $pic_file . '</p>';
+	
+	$list_html = "<ul>Valida on järgmised fotod: ";
+	for($i = 0; $i < $limit; $i++){
+		$list_html .= "<li>" . $photo_files[$i] . "</li> \n";
+	}
+	$list_html .= "</ul>";
+	
+	$photo_select_html = '<select name="photo_select">' . "\n";
+	for($i = 0; $i < $limit; $i++){
+		if ($i == $pic_num){
+			$photo_select_html .= '<option value="'. $i .'" selected>'. $photo_files[$i] .'</option>' . " \n";
+		}
+		else{
+			$photo_select_html .= '<option value="' . $i . '">'. $photo_files[$i] .'</option>' . " \n";
+		}
+	}
+	$photo_select_html .= '</select>'
 ?>
 <!DOCTYPE html>
 <html lang="et">
 <head>
 	<meta charset="utf-8">
-		<title><?php echo $author_name; ?>, veebiprogrammerimine</title>
-		
+	<title><?php echo $author_name; ?>, veebiprogrammeerimine</title>
 </head>
 <body>
-	<h1><?php echo $author_name; ?>, veebiprogrammerimine</h1>
-		<p>See leht on valminud õppetöö raames ja ei sisalda mingit tõsiseltvõetavat sisu!</p>
-			<p> Õppetöö toimub <a href="https://www.tlu.ee/dt">Tallinna Ülikooli Digitehnoloogiate instituudis</a>.</p>
-				<hr>
-				<!--ekraanivorm-->
-				<form method="post">
-					<input type="text" name="todays_adjective_input" placeholder="Tänase päeva ilma omadus" value="<?php echo $todays_adjective?>">
-					<input type="submit" name="submit_todays_adjective" value="Saada ära">
-					<span><?php echo $today_adjective_error ?> </span>
-				</form>
-				<?php echo $today_html; ?>
-				<hr>
-				<form method="post">
-				<?php echo $photo_select_html?>
-				<input type="submit" name="submit_photo_select" value="Saada ära">
-				<?php echo $photo_html; 
-				echo $photo_list_html;?>
+	<h1><?php echo $author_name; ?>, veebiprogrammeerimine</h1>
+	<p>See leht on valminud õppetöö raames ja ei sisalda mingisugust tõsiseltvõetavat sisu!</p>
+	<p>Õppetöö toimus <a href="https://www.tlu.ee/dt">Tallinna Ülikooli Digitehnoloogiate instituudis.</a></p>
+	<hr>
+	<form method="POST">
+		<input type="text" name="adjective_input" placeholder="omadussõna tänase kohta" value="<?php echo $inserted_adjective;?>">
+		<input type="submit" name="todays_adjective_input" value="Saada ära">
+		<span><?php echo $adjective_error;?></span>
+	</form>
+	<hr>
+	<?php
+		echo $todays_evaluation;
+	?>
+	<form method="POST">
+		<?php echo $photo_select_html;?>
+		<input type="submit" name="submit_photo" value="Näita pilti">
+	</form>
+	<?php
+		echo $pic_html;
+		echo $list_html;
+	?>
 </body>
 </html>
