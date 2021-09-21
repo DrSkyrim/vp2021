@@ -1,42 +1,9 @@
 <?php
 	require_once("../../config.php");
-	
+	require_once("fnc_film.php");
 	$author_name = "Martin Lukas";
-	
-	$database = "if21_martin_lu";
-	//Loome andmebaasi yhenduse mysqli server,kasytaja,parool, andmebaas
-	$conn = new mysqli($server_host,$sever_user_name,$server_password,$database);
-	//maarame oige kodeeringu
-	$conn->set_charset("utf8");
-	//valmistan ette sql paring: Select * FROm film
-	$stmt = $conn->prepare("SELECT * FROM film");
-	echo $conn->error;
-	//seon tulemused muutujaga
-	$stmt->bind_result($Title_from_db, $year_from_db, $length_from_db, $genre_from_db, $studio_from_db, $producer_from_db);
-	//taidan kasu
-	$film_html = null ;
-	$stmt->execute();
-	//votttan kirjeid kuni jatkub
-	while($stmt->fetch()){
-	
-		//<h3>Filmi nimi</h3>
-		//<ul>
-		//<li> Valmimisaasta
-		//<li>
-		//</ul>
-		$film_html .= "<h3>" .$Title_from_db ."</h3>";
-		$film_html .= "<ul>";
-		$film_html .= "<li>Valmimisaasta ". $year_from_db."</li>";
-		$film_html .= "<li>Kestus " .$length_from_db ."</li>";
-		$film_html .= "<li>Zanr ". $genre_from_db."</li>";
-		$film_html .= "<li>Stuudio ". $studio_from_db."</li>";
-		$film_html .= "<li>Lavastaja ". $producer_from_db."</li>";
-		$film_html .= "</ul> \n";
-	}
-	//sulgen kask
-	$stmt->close();
-	//sulgen ab yhenduse
-	$conn->close();
+	$film_html = null;
+	$film_html = read_all_films();
 ?>
 <!DOCTYPE html>
 <html lang="et">
