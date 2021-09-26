@@ -10,6 +10,14 @@
 		} else{
 				$film_store_notice = "Osa andmeid on puudu!";
 		}
+		if(empty($_POST["title_input"])){$film_store_notice="Sisetage pealkiri!";}
+		if(empty($_POST["genre_input"])){$film_store_notice="Sisetage zanr";}
+		if(empty($_POST["studio_input"])){$film_store_notice="Sisetage stuudio!";}
+		if(empty($_POST["director_input"])){$film_store_notice="Sisetage lavastaja!";}
+		$film_title=$_POST["title_input"];
+		$film_genre=$_POST["genre_input"];
+		$film_studio=$_POST["studio_input"];
+		$film_producer=$_POST["producer_input"];
 	}
 ?>
 <!DOCTYPE html>
@@ -27,7 +35,7 @@
 	<h2>Eesti filmid</h2>
 	<form method="POST">
 		<label for="title_input">Filmi pealkiri: </label>
-		<input type="text" name="title_input" id="title_input" placeholder="pealkiri">
+		<input type="text" name="title_input" id="title_input" placeholder="pealkiri" value="<?php echo $film_title; ?>">
 		<br>
 		<label for="year_input"> Valmimisaasta: </label>
 		<input type="number" name="year_input" id="year_input" value="<?php echo date("Y")?>" min="1912">
@@ -36,13 +44,13 @@
 		<input type="number" name="duration_input" id="duration_input" value="80" min="1">
 		<br>
 		<label for="genre_input">Filmi zanr: </label>
-		<input type="text" name="genre_input" id="genre_input" placeholder="zanr">
+		<input type="text" name="genre_input" id="genre_input" placeholder="zanr" value="<?php echo $film_genre; ?>">
 		<br>		
 		<label for="studio_input">Filmi tootja: </label>
-		<input type="text" name="studio_input" id="studio_input" placeholder="tootja">
+		<input type="text" name="studio_input" id="studio_input" placeholder="tootja" value="<?php echo $film_studio; ?>">
 		<br>
 		<label for="director_input">Filmi lavastaja: </label>
-		<input type="text" name="director_input" id="director_input" placeholder="lavastaja">
+		<input type="text" name="director_input" id="director_input" placeholder="lavastaja" value="<?php echo $film_producer; ?>">
 		<br>
 		<input type="submit" name="film_submit" value="Salvesta!">
 	</form>
