@@ -33,7 +33,7 @@
 	<p>Õppetöö toimus 2021 sügisel.</p>
 	<hr>
 	<h2>Eesti filmid</h2>
-	<form method="POST">
+	<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">>
 		<label for="title_input">Filmi pealkiri: </label>
 		<input type="text" name="title_input" id="title_input" placeholder="pealkiri" value="<?php echo $film_title; ?>">
 		<br>
