@@ -1,7 +1,7 @@
 <?php
     require_once("../../config.php");
     require_once("fnc_general.php");
-    //require_once("fnc_user.php");
+    require_once("fnc_user.php");
 
     $notice = null;
     $firstname = null;
@@ -87,7 +87,7 @@
 			//kontrollime kuupaeva oigsust ja paneme kuupaev kokku
 			if(empty($birth_day_error)and empty($birth_month_error) and empty($birth_year_error)){
 				if(checkdate($birth_month, $birth_day, $birth_year)){
-					$temp_date = new DateTime($birth_year ."-". $birth_month."_".$birth_day);
+					$temp_date = new DateTime($birth_year ."-". $birth_month."-".$birth_day);
 					$birth_date = $temp_date->format("Y-m-d");
 				}
 				else{
@@ -120,6 +120,11 @@
 			else{
 				$confirm_password_error="Palun sisesta salasona teist korda!";
 			}
+		//salvestus kui koik korras
+		if(empty($firstname_error) and empty($surname_error) and empty($birth_month_error) and empty($birth_year_error) and empty($birth_day_error) and empty($birth_date_error) and empty($gender_error) and empty($email_error) and empty($password_error) and empty($confirm_password_error)){
+			$notice = sign_up($firstname,$surname,$email,$gender,$birth_date,$_POST["password_input"]);
+		}
+		
         }//if isset lõppeb
     }//if request_method lõppeb
 ?>
