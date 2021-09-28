@@ -22,3 +22,31 @@
 		$conn->close();
 		return $notice;
 	}
+	function sign_in($email, $password){
+        $notice = null;
+        $conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
+        $conn->set_charset("utf8");
+        $stmt = $conn->prepare("SELECT id, firstname, lastname, password FROM vpr_users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->bind_result($id_from_db, $firstname_from_db, $lastname_from_db, $password_from_db);
+        echo $conn->error;
+        $stmt->execute();
+        if($stmt->fetch()){
+            //kasutaja on olemas, kontrollime parooli
+            if(password_verify($password, $password_from_db)){
+                //ongi õige
+                $stmt->close();
+                $conn->close();
+                header("Location: home.php");
+                exit();
+            } else {
+                $notice = "Kasutajanimi või salasõna oli vale!";
+            }
+        } else {
+            $notice = "Kasutajanimi või salasõna oli vale!";
+        }
+        
+        $stmt->close();
+        $conn->close();
+        return $notice; 
+    }
