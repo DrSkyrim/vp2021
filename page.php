@@ -1,4 +1,5 @@
 <?php
+session_start();
 	$author_name = "Martin Lukas";
 	require_once("../../config.php");
 	require_once ("fnc_user.php");
@@ -83,9 +84,12 @@
 	}
 	$photo_select_html .= "</select> \n";
 	$notice=null;
+	$email_store=null;
+	$email_store=$_POST["email_input"];
 	if(isset($_POST["login_submit"])){
 	$notice=sign_in($_POST["email_input"],$_POST["password_input"]);
 	}
+	
 	
 ?>
 <!DOCTYPE html>
@@ -101,7 +105,7 @@
 	<p>Õppetöö toimus 2021 sügisel.</p>
 	<hr>
 	<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-	<input type="email" name="email_input" placeholder="Kasutajatunnus(meil)">
+	<input type="email" name="email_input" placeholder="Kasutajatunnus(meil)" value="<?php echo $email_store;?>">
 	<input type="password" name="password_input" placeholder="Parool">
 	<input type="submit" name="login_submit" value="Logi sisse">
 	<p><?php echo $notice?></p>

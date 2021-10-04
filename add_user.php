@@ -25,6 +25,7 @@
     $email_error = null;
     $password_error = null;
     $confirm_password_error = null;
+	$user_exists_error = null;
 
     //kontrollime sisestust
     if($_SERVER["REQUEST_METHOD"] === "POST"){

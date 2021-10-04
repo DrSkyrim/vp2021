@@ -6,6 +6,12 @@
 		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
 		
 		$conn->set_charset("utf8");
+		$stmt = $conn->prepare("SELECT id FROM vpr_users WHERE email = ?");
+			 if($stmt->fetch()){
+				 if($email==$email_from_db){
+					 $user_exists_error="Selline kasutaja juba on olemas";
+				 }
+			 }
 		$stmt = $conn->prepare("INSERT INTO vpr_users(firstname,lastname,birthdate,gender,email,password) VALUES (?,?,?,?,?,?)");
 		echo $conn->error;
 		//krypteerime parooli
@@ -31,6 +37,7 @@
         $stmt->bind_result($id_from_db, $firstname_from_db, $lastname_from_db, $password_from_db);
         echo $conn->error;
         $stmt->execute();
+		$_SESSION["user_id"] = $id_from_db;
         if($stmt->fetch()){
             //kasutaja on olemas, kontrollime parooli
             if(password_verify($password, $password_from_db)){
