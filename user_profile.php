@@ -15,7 +15,11 @@
 	require_once("fnc_general.php");
 	$notice = null;
 	$description=null;//tulevikus loetakse andmetabelist olemasolev kirjeldus
-	
+	$bgcolor=null;
+	$color=null;
+	if(isset($_POST["profile_submit"])){
+	$notice=profile_save($_POST["description_input"],$_POST["bg_color_input"],$_POST["text_color_input"]);
+	}
 	require_once("page_header.php");
 ?>
 

@@ -52,8 +52,10 @@
 				$_SESSION["first_name"] = $firstname_from_db;
                 $_SESSION["last_name"] = $lastname_from_db;
 				//siin edaspidi sisselogimisel parime sqliga kasutaja profiili kui see on olemas,ss loeme sealt tausta- ja tekstivarvid muidu kasutame vaikevarve
-				$_SESSION["bg_color"] = "#AAAAAA"; //valge #FFFFFF
-				$_SESSION["text_color"]="#0000AA"; //must #000000
+				$stmt->close();
+				$stmt = $conn->prepare("SELECT bgcolor,txtcolor FROM vpr_userprofiles WHERE userid=?");
+				$_SESSION["bg_color"] = "#FFFFFF"; //valge #FFFFFF
+				$_SESSION["text_color"]="#000000"; //must #000000
                 $stmt->close();
                 $conn->close();
                 header("Location: home.php");
@@ -69,3 +71,41 @@
         $conn->close();
         return $notice; 
     }
+	
+	function profile_save($description,$bgcolor,$txtcolor){
+		$notice = null;
+		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
+		
+		$conn->set_charset("utf8");
+
+		$stmt = $conn->prepare("INSERT INTO vpr_userprofiles (userid,description,bgcolor,txtcolor) VALUES (?,?,?,?)");
+		echo $conn->error;
+		$stmt->bind_param("isss",$_SESSION["user_id"],$description,$bgcolor,$txtcolor);
+		if($stmt->execute()){
+			$notice="Profiil salvestatud";
+		}
+		else{
+			$notice="Profiili salvestusel tekkis viga"; //$stmt_error;
+		}
+		
+		$stmt->close();
+		$conn->close();
+		return $notice;
+		
+		
+	}
+		//	$stmt = $conn->prepare("SELECT id FROM vpr_userprofiles WHERE userid = ?");
+		//$stmt->bind_param("i", $_SESSION["user_id"]);
+			//$stmt->bind_result($id_from_db);
+			//$stmt->execute();
+		//($stmt->fetch())
+		//	$stmt = $conn->prepare("SELECT description,bgcolor,txtcolor FROM vpr_userprofiles WHERE id=?");
+			//$stmt->bind_param("i", $id);
+			//$stmt->bind_result( $description_from_db, $bgcolor_from_db, $textcolor_from_db);
+			//echo $conn->error;
+			//if($stmt->execute()){
+			//$_SESSION["description"] = $description_from_db;
+			//$_SESSION["bg_color"] = $bgcolor_from_db ; //valge #FFFFFF
+			//$_SESSION["text_color"]= $textcolor_from_db ;
+		//}
+		
