@@ -1,8 +1,8 @@
 <?php
-session_start();
+	session_start();
+    require_once("../../config.php");
+    require_once("fnc_user.php");
 	$author_name = "Martin Lukas";
-	require_once("../../config.php");
-	require_once ("fnc_user.php");
 	
 	//vaatan, mida POST meetodil saadeti
 	//var_dump($_POST);
@@ -83,14 +83,34 @@ session_start();
         $photo_select_html .= '>' .$all_photos[$i] ."</option> \n";
 	}
 	$photo_select_html .= "</select> \n";
-	$notice=null;
-	$email_store=null;
-	$email_store=$_POST["email_input"];
-	if(isset($_POST["login_submit"])){
-	$notice=sign_in($_POST["email_input"],$_POST["password_input"]);
-	}
 	
-	
+    $email = null;
+	$email_error = null;
+	$password_error = null;
+	$notice = null;
+    //sisselogimine
+    if(isset($_POST["login_submit"])){
+		if(isset($_POST["email_input"]) and !empty($_POST["email_input"])){
+			$email = filter_var($_POST["email_input"], FILTER_VALIDATE_EMAIL);
+			if(strlen($email) < 5){
+				$email_error = "Palun sisesta kasutajatunnus (e-mail)!";
+			}
+		} else {
+			$email_error = "Palun sisesta kasutajatunnus (e-mail)!";
+		}
+		if(isset($_POST["password_input"]) and !empty($_POST["password_input"])){
+			if(strlen($_POST["password_input"]) < 8){
+				$password_error = "Sisestatud salasõna on liiga lühike!";
+			}
+		} else {
+			$password_error = "Palun sisesta salasõna!";
+		}
+		if(empty($email_error) and empty($password_error)){
+			$notice = sign_in($email, $_POST["password_input"]);
+		} else {
+			$notice = $email_error ." " .$password_error;
+		}
+    }
 ?>
 <!DOCTYPE html>
 <html lang="et">
@@ -104,13 +124,14 @@ session_start();
 	<p>Õppetöö toimub <a href="https://www.tlu.ee/dt">Tallinna Ülikooli Digitehnoloogiate instituudis</a>.</p>
 	<p>Õppetöö toimus 2021 sügisel.</p>
 	<hr>
-	<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-	<input type="email" name="email_input" placeholder="Kasutajatunnus(meil)" value="<?php echo $email_store;?>">
-	<input type="password" name="password_input" placeholder="Parool">
-	<input type="submit" name="login_submit" value="Logi sisse">
-	<p><?php echo $notice?></p>
-	</form>
-	<hr>
+    <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+        <input type="email" name="email_input" placeholder="email ehk kasutajatunnus" value="<?php echo $email; ?>">
+        <input type="password" name="password_input" placeholder="salasõna">
+        <input type="submit" name="login_submit" value="Logi sisse">
+		<span><?php echo $notice; ?></span>
+		<p>Loo endale<a href="add_user.php">kasutaja</a></p>
+    </form>
+    <hr>
 	<!--ekraanivorm-->
 	<form method="POST">
 		<input type="text" name="todays_adjective_input" placeholder="tänase päeva ilma omadus" value="<?php echo $todays_adjective; ?>">

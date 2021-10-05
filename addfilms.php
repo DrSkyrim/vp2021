@@ -1,8 +1,23 @@
 <?php
+ //alustame sessiooni
+    session_start();
+    //kas on sisselogitud
+    if(!isset($_SESSION["user_id"])){
+        header("Location: page.php");
+    }
+    //väljalogimine
+    if(isset($_GET["logout"])){
+        session_destroy();
+        header("Location: page.php");
+    }
 	require_once("../../config.php");
 	require_once("fnc_film.php");
 	$author_name = "Martin Lukas";
 	$film_store_notice = null;
+		$film_title=null;
+		$film_genre=null;
+		$film_studio=null;
+		$film_producer=null;
 	//Kas klikiti submit nuppu
 	if(isset($_POST["film_submit"])){
 		if(!empty($_POST["title_input"]) and !empty($_POST["genre_input"]) and !empty($_POST["studio_input"]) and !empty($_POST["director_input"])){
@@ -14,19 +29,16 @@
 		if(empty($_POST["genre_input"])){$film_store_notice="Sisetage zanr";}
 		if(empty($_POST["studio_input"])){$film_store_notice="Sisetage stuudio!";}
 		if(empty($_POST["director_input"])){$film_store_notice="Sisetage lavastaja!";}
+
 		$film_title=$_POST["title_input"];
 		$film_genre=$_POST["genre_input"];
 		$film_studio=$_POST["studio_input"];
 		$film_producer=$_POST["producer_input"];
 	}
+	
+	require_once("page_header.php");
 ?>
-<!DOCTYPE html>
-<html lang="et">
-<head>
-	<meta charset="utf-8">
-	<title><?php echo $author_name; ?>, veebiprogrammeerimine</title>
-</head>
-<body>
+
 	<h1><?php echo $author_name; ?>, veebiprogrammeerimine</h1>
 	<p>See leht on valminud õppetöö raames ja ei sisalda mingit tõsiseltvõetavat sisu!</p>
 	<p>Õppetöö toimub <a href="https://www.tlu.ee/dt">Tallinna Ülikooli Digitehnoloogiate instituudis</a>.</p>
@@ -56,6 +68,9 @@
 	</form>
 	<br>
 	<span><?php echo $film_store_notice ?> </span>
+	<p><a href="listfilms.php">Filmide nimekiri</a></p>
+	<p><a href="home.php">Avalehele</a></p>
+	<p><a href="?logout=1">Logi välja</a></p>
 		
 </body>
 </html>

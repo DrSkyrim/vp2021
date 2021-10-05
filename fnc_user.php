@@ -7,11 +7,15 @@
 		
 		$conn->set_charset("utf8");
 		$stmt = $conn->prepare("SELECT id FROM vpr_users WHERE email = ?");
-			 if($stmt->fetch()){
-				 if($email==$email_from_db){
-					 $user_exists_error="Selline kasutaja juba on olemas";
-				 }
-			 }
+			$stmt->bind_param("s", $email);
+			$stmt->bind_result($id_from_db);
+			$stmt->execute();
+			if($stmt->fetch()){
+			//kasutaja juba olemas
+			$notice = "Sellise tunnusega (" .$email .") kasutaja on <strong>juba olemas</strong>!";
+		} else {
+			//sulgen eelmise käsu
+			$stmt->close();
 		$stmt = $conn->prepare("INSERT INTO vpr_users(firstname,lastname,birthdate,gender,email,password) VALUES (?,?,?,?,?,?)");
 		echo $conn->error;
 		//krypteerime parooli
@@ -24,9 +28,11 @@
 		else{
 			$notice="Uue kasutaja loomisel tekkis viga" .$stmt_error;
 		}
+		}
 		$stmt->close();
 		$conn->close();
 		return $notice;
+		
 	}
 	function sign_in($email, $password){
         $notice = null;
@@ -42,6 +48,12 @@
             //kasutaja on olemas, kontrollime parooli
             if(password_verify($password, $password_from_db)){
                 //ongi õige
+				$_SESSION["user_id"] = $id_from_db;
+				$_SESSION["first_name"] = $firstname_from_db;
+                $_SESSION["last_name"] = $lastname_from_db;
+				//siin edaspidi sisselogimisel parime sqliga kasutaja profiili kui see on olemas,ss loeme sealt tausta- ja tekstivarvid muidu kasutame vaikevarve
+				$_SESSION["bg_color"] = "#AAAAAA"; //valge #FFFFFF
+				$_SESSION["text_color"]="#0000AA"; //must #000000
                 $stmt->close();
                 $conn->close();
                 header("Location: home.php");

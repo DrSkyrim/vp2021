@@ -200,7 +200,7 @@
 	  
 	  <br>
 	  <label for="email_input">E-mail (kasutajatunnus):</label><br>
-	  <input type="email" name="email_input" id="email_input" value="<?php echo $email; ?>"><span><?php echo $email_error; ?></span><br>
+	  <input type="email" name="email_input" id="email_input" value="<?php echo $email; ?>"><span><?php echo $email_error; ?></span><span><?php echo $notice; ?></span><br>
 	  <label for="password_input">Salasõna (min 8 tähemärki):</label><br>
 	  <input name="password_input" id="password_input" type="password"><span><?php echo $password_error; ?></span><br>
 	  <label for="confirm_password_input">Korrake salasõna:</label><br>
