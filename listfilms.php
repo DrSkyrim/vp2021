@@ -19,7 +19,7 @@
 	require_once("page_header.php");
 ?>
 
-	<h1><?php echo $author_name; ?>, veebiprogrammeerimine</h1>
+	<h1><?php echo $_SESSION["first_name"] ." " .$_SESSION["last_name"]; ?>, veebiprogrammeerimine</h1>
 	<p><a href="addfilms.php">Filmide lisamine</a></p>
 	<p><a href="home.php">Avalehele</a></p>
 	<p><a href="?logout=1">Logi välja</a></p>

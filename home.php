@@ -14,12 +14,13 @@ if(isset($_GET["logout"])){
 	
 ?>
 
-	<h1><?php echo $author_name; ?>, veebiprogrammeerimine</h1>
+	<h1><?php echo $_SESSION["first_name"] ." " .$_SESSION["last_name"]; ?>,, veebiprogrammeerimine</h1>
 	<p>See leht on valminud õppetöö raames ja ei sisalda mingit tõsiseltvõetavat sisu!</p>
 	<p>Õppetöö toimub <a href="https://www.tlu.ee/dt">Tallinna Ülikooli Digitehnoloogiate instituudis</a>.</p>
 	<p>Oled sees.</p>
 	<p><a href="listfilms.php">Filmide nimekiri</a></p>
 	<p><a href="addfilms.php">Filmide lisamine</a></p>
+	<p><a href="user_profile.php">Kasutaja Profiil</a></p>
 	<p><a href="?logout=1">Logi välja</a></p>
 
 </body>
