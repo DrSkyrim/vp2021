@@ -53,11 +53,22 @@
                 $_SESSION["last_name"] = $lastname_from_db;
 				//siin edaspidi sisselogimisel parime sqliga kasutaja profiili kui see on olemas,ss loeme sealt tausta- ja tekstivarvid muidu kasutame vaikevarve
 				$stmt->close();
-				$stmt = $conn->prepare("SELECT bgcolor,txtcolor FROM vpr_userprofiles WHERE userid=?");
-				$_SESSION["bg_color"] = "#FFFFFF"; //valge #FFFFFF
-				$_SESSION["text_color"]="#000000"; //must #000000
-                $stmt->close();
-                $conn->close();
+					$stmt = $conn->prepare("SELECT bgcolor,txtcolor FROM vpr_userprofiles WHERE userid=?");
+					$stmt->bind_param("i", $_SESSION["user_id"]);
+					$stmt->bind_result($bg_color_from_db, $txt_color_from_db);
+					$stmt->execute();
+					$_SESSION["bg_color"] = "#FFFFFF"; //valge #FFFFFF
+					$_SESSION["text_color"]="#000000"; //must #000000
+						if($stmt->fetch()){
+							if(!empty($txt_color_from_db)){
+								$_SESSION["text_color"]=$txt_color_from_db
+							}
+							if(!empty($bg_color_from_db)){
+								$_SESSION["bg_color"]=$bg_color_from_db
+							}
+						}
+					$stmt->close();
+					$conn->close();
                 header("Location: home.php");
                 exit();
             } else {
@@ -71,6 +82,24 @@
         $conn->close();
         return $notice; 
     }
+		function read_user_description(){
+		//kui profiil on olemas, loeb kasutaja lühitutvustuse
+		$notice = null;
+		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
+		$conn->set_charset("utf8");
+		//vaatame, kas on profiil olemas
+		$stmt = $conn->prepare("SELECT description FROM vpr_userprofiles WHERE userid = ?");
+		echo $conn->error;
+		$stmt->bind_param("i", $_SESSION["user_id"]);
+		$stmt->bind_result($description_from_db);
+		$stmt->execute();
+		if($stmt->fetch()){
+			$notice = $description_from_db;
+		}
+		$stmt->close();
+		$conn->close();
+		return $notice;
+	}
 	
 	function profile_save($description,$bgcolor,$txtcolor){
 		$notice = null;

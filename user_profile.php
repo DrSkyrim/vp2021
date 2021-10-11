@@ -14,7 +14,7 @@
 	require_once("fnc_user.php");
 	require_once("fnc_general.php");
 	$notice = null;
-	$description=null;//tulevikus loetakse andmetabelist olemasolev kirjeldus
+	$description=read_user_description();//tulevikus loetakse andmetabelist olemasolev kirjeldus
 	$bgcolor=null;
 	$color=null;
 	if(isset($_POST["profile_submit"])){
