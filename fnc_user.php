@@ -61,10 +61,10 @@
 					$_SESSION["text_color"]="#000000"; //must #000000
 						if($stmt->fetch()){
 							if(!empty($txt_color_from_db)){
-								$_SESSION["text_color"]=$txt_color_from_db
+								$_SESSION["text_color"]=$txt_color_from_db;
 							}
 							if(!empty($bg_color_from_db)){
-								$_SESSION["bg_color"]=$bg_color_from_db
+								$_SESSION["bg_color"]=$bg_color_from_db;
 							}
 						}
 					$stmt->close();
@@ -107,21 +107,34 @@
 		
 		$conn->set_charset("utf8");
 
-		$stmt = $conn->prepare("INSERT INTO vpr_userprofiles (userid,description,bgcolor,txtcolor) VALUES (?,?,?,?)");
+$stmt = $conn->prepare("SELECT id FROM vpr_userprofiles WHERE userid = ?");
 		echo $conn->error;
-		$stmt->bind_param("isss",$_SESSION["user_id"],$description,$bgcolor,$txtcolor);
+		$stmt->bind_param("i", $_SESSION["user_id"]);
+		$stmt->bind_result($id_from_db);
+		$stmt->execute();
+		if($stmt->fetch()){
+			$stmt->close();
+			//uuendame profiili
+			$stmt= $conn->prepare("UPDATE vpr_userprofiles SET description = ?, bgcolor = ?, txtcolor = ? WHERE userid = ?");
+			echo $conn->error;
+			$stmt->bind_param("sssi", $description, $bg_color, $txt_color, $_SESSION["user_id"]);
+		} else {
+			$stmt->close();
+			//tekitame uue profiili
+			$stmt = $conn->prepare("INSERT INTO vpr_userprofiles (userid, description, bgcolor, txtcolor) VALUES(?,?,?,?)");
+			echo $conn->error;
+			$stmt->bind_param("isss", $_SESSION["user_id"], $description, $bg_color, $txt_color);
+		}
 		if($stmt->execute()){
-			$notice="Profiil salvestatud";
+			$_SESSION["bg_color"] = $_POST["bg_color_input"];
+			$_SESSION["text_color"] = $_POST["text_color_input"];
+			$notice = "Profiil salvestatud!";
+		} else {
+			$notice = "Profiili salvestamisel tekkis viga: " .$stmt->error;
 		}
-		else{
-			$notice="Profiili salvestusel tekkis viga"; //$stmt_error;
-		}
-		
 		$stmt->close();
 		$conn->close();
 		return $notice;
-		
-		
 	}
 		//	$stmt = $conn->prepare("SELECT id FROM vpr_userprofiles WHERE userid = ?");
 		//$stmt->bind_param("i", $_SESSION["user_id"]);
