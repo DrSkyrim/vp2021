@@ -76,7 +76,7 @@
 			$photo_submit_notice="Foto laadimisel tekkis viga".$stmt->error;
 		}
 	}
-	//vana osa
+
     function read_all_films(){
 		//var_dump($GLOBALS);
 		//Loome andmebaasi yhenduse mysqli server,kasytaja,parool, andmebaas
@@ -84,12 +84,13 @@
 		//maarame oige kodeeringu
 		$conn->set_charset("utf8");
 		//valmistan ette sql paring: Select * FROm film
-		$stmt = $conn->prepare("SELECT * FROM film");
+		$stmt = $conn->prepare("SELECT movie.title,movie.production_year,movie.duration,genre.genre_name FROM movie JOIN movie_genre ON movie.id=movie_genre.movie_id JOIN genre ON genre.id=movie_genre.genre_id;
+  ");
 		echo $conn->error;
 		//seon tulemused muutujaga
-		$stmt->bind_result($Title_from_db, $year_from_db, $length_from_db, $genre_from_db, $studio_from_db, $producer_from_db);
+		$stmt->bind_result($title_from_db, $year_from_db, $length_from_db, $genre_from_db);
 		//taidan kasu
-		$film_html = null ;
+		$film_html = null ; 	
 		$stmt->execute();
 		//votttan kirjeid kuni jatkub
 		while($stmt->fetch()){
@@ -99,13 +100,11 @@
 			//<li> Valmimisaasta
 			//<li>
 			//</ul>
-			$film_html .= "<h3>" .$Title_from_db ."</h3>";
+			$film_html .= "<h3>" .$title_from_db ."</h3>";
 			$film_html .= "<ul>";
 			$film_html .= "<li>Valmimisaasta ". $year_from_db."</li>";
 			$film_html .= "<li>Kestus " .$length_from_db ."</li>";
 			$film_html .= "<li>Zanr ". $genre_from_db."</li>";
-			$film_html .= "<li>Stuudio ". $studio_from_db."</li>";
-			$film_html .= "<li>Lavastaja ". $producer_from_db."</li>";
 			$film_html .= "</ul> \n";
 		}
 		//sulgen kask
@@ -114,7 +113,7 @@
 		$conn->close();
 		return $film_html;
     }
-	
+		//vana osa
 	function store_film($title_input,$year_input,$duration_input,$genre_input,$studio_input,$director_input){
 		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
 		$conn->set_charset("utf8");

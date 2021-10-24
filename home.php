@@ -18,7 +18,7 @@ if(isset($_GET["logout"])){
 	<p>See leht on valminud õppetöö raames ja ei sisalda mingit tõsiseltvõetavat sisu!</p>
 	<p>Õppetöö toimub <a href="https://www.tlu.ee/dt">Tallinna Ülikooli Digitehnoloogiate instituudis</a>.</p>
 	<p>Oled sees.</p>
-	<p><a href="listfilms.php">Filmide nimekiri</a></p>
+	<p><a href="listmovies.php">Filmide nimekiri</a></p>
 	<p><a href="addfilms.php">Filmide lisamine</a></p>
 	<p><a href="user_profile.php">Kasutaja Profiil</a></p>
 	<p><a href="movie_relations.php">Filmi info seoste loomine</a></p>
