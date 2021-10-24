@@ -143,7 +143,7 @@
 	}
 	    function store_person_in_movie($selected_person, $selected_movie, $selected_position, $role){
         $notice = null;
-       $conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
+		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
         $conn->set_charset("utf8");
         //<option value="x" selected>Film</option>
         $stmt = $conn->prepare("SELECT id FROM person_in_movie WHERE person_id = ? AND movie_id = ? AND position_id = ? AND role = ?");
@@ -155,8 +155,55 @@
             $notice = "Selline seos on juba olemas!";
         } else {
             $stmt->close();
-            $stmt = $conn->prepare("INSERT INTO person_in_movie (person_id, movie_id, position_id, role) VALUES (?, ?, ?, ?)"); 
+            $stmt = $conn->prepare("INSERT INTO person_in_movie (person_id, movie_id, position_id, role) VALUES (?,?,?,?)"); 
             $stmt->bind_param("iiis", $selected_person, $selected_movie, $selected_position, $role);
+            if($stmt->execute()){
+                $notice = "Uus seos edukalt salvestatud!";
+            } else {
+                $notice = "Uue seose salvestamisle tekkis viga: " .$stmt->error;
+            }
+        }
+        $stmt->close();
+        $conn->close();
+        return $notice;
+    }
+	  function read_all_genre_for_option($genre_selected){
+		  $genre_option_html=null;
+		  $conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
+		  $conn->set_charset("utf8");
+		  $stmt = $conn->prepare("SELECT id,genre_name FROM genre");
+		  echo $conn->error;
+		  $stmt->bind_result($genreid_from_db,$genre_name_from_db);
+		  $stmt->execute();
+		    //<option value="x" selected>Eesnimi Perekonnanimi(Synniaeg)</option>
+		   while($stmt->fetch()){
+			  $genre_option_html .='<option value="'.$genreid_from_db.'"';
+			  if($genreid_from_db == $genre_selected){
+				  $genre_option_html .=" selected";
+			  }
+			  $genre_option_html .= ">" .$genre_name_from_db. "</option> \n";
+		   }
+		$stmt->close();
+		//sulgen ab yhenduse
+		$conn->close();
+		return $genre_option_html;
+	   }
+	   function store_genre_in_movie($selected_movie, $selected_genre){
+        $notice = null;
+		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
+        $conn->set_charset("utf8");
+        //<option value="x" selected>Film</option>
+        $stmt = $conn->prepare("SELECT id FROM movie_genre WHERE movie_id = ? AND genre_id = ?");
+        $stmt->bind_param("ii",$selected_movie, $selected_genre,);
+        $stmt->bind_result($id_from_db);
+        $stmt->execute();
+        if($stmt->fetch()){
+            //selline on olemas
+            $notice = "Selline seos on juba olemas!";
+        } else {
+            $stmt->close();
+            $stmt = $conn->prepare("INSERT INTO movie_genre (movie_id, genre_id) VALUES (?,?)"); 
+            $stmt->bind_param("ii", $selected_movie, $selected_genre,);
             if($stmt->execute()){
                 $notice = "Uus seos edukalt salvestatud!";
             } else {
