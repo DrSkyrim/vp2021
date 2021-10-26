@@ -22,6 +22,7 @@ if(isset($_GET["logout"])){
 	<p><a href="addfilms.php">Filmide lisamine</a></p>
 	<p><a href="user_profile.php">Kasutaja Profiil</a></p>
 	<p><a href="movie_relations.php">Filmi info seoste loomine</a></p>
+	<p><a href="gallery_photo_upload">Fotode üleslaadimine</a></p>
 	<p><a href="?logout=1">Logi välja</a></p>
 
 </body>
