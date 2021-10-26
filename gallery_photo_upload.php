@@ -11,7 +11,7 @@
         header("Location: page.php");
     }
 	require_once("../../config.php");
-	//require_once("fnc_foto_upload.php");
+	require_once("fnc_photo_upload.php");
 	require_once("fnc_general.php");
 
 
@@ -26,6 +26,11 @@
 	$file_name_prefix = "vp_";
 	$alt_text=null;
 	$privacy=1;
+	$file_size_limit= 1024*1024;
+	$photo_max_width=600;
+	$photo_max_height=400;
+	$photo_size_ratio=1;
+	$watermark_dir="Pics/vp_logo_w100_overlay.png";
 	$file_type=null;
 	$file_name=null;
 	if(isset($_POST["photo_submit"])){
@@ -43,21 +48,71 @@
 					if($imgcheck["mime"] == "image/gif"){
 						$file_type = "gif";
 						}
-						//teen ajatempli
-						$timestamp = microtime(1)*10000;
-						//moodustan failinime
-						$file_name= $file_name_prefix .$timestamp .".".$file_type;
-						if(move_uploaded_file($_FILES["photo_input"]["tmp_name"], $photo_upload_orig_dir .$file_name)){
-							//$photo_submit_notice= store_person_photo($file_name,$_POST["person_select_for_photo"]);
-						}
-						else{
-							$photo_submit_notice="foto yleslaadimine ei onnestunud";
-						}
 				}
 				else{
 					$photo_submit_notice="Valitud fail ei ole pilt";
 				}
-			
+			//Kas foto on õige suurusega(mahuga)
+			if(empty($photo_submit_notice) and ($_FILES["photo_input"]["size"] > $file_size_limit)){
+				$photo_submit_notice="Valitud fail on liiga suur";
+			}
+			//teen ajatempli
+						$timestamp = microtime(1)*10000;
+						//moodustan failinime
+						$file_name= $file_name_prefix .$timestamp .".".$file_type;
+			if(empty($photo_submit_notice)){
+				//hakkan foto suurust muutma
+				//loon image objekti
+				if($file_type=="jpg"){
+				$my_temp_image = imagecreatefromjpeg($_FILES["photo_input"]["tmp_name"]);
+				}
+				if($file_type=="png"){
+				$my_temp_image = imagecreatefrompng($_FILES["photo_input"]["tmp_name"]);
+				}
+				if($file_type=="gif"){
+				$my_temp_image = imagecreatefromgif($_FILES["photo_input"]["tmp_name"]);
+				}
+				//foto originaalmõõdud
+				$image_width = imagesx($my_temp_image);
+				$image_height = imagesy($my_temp_image);
+				if($image_width/$photo_max_width > $image_height/$photo_max_height){
+					$photo_size_ratio=$image_width/$photo_max_width;
+				}
+				else{
+					$photo_size_ratio=$image_height/$photo_max_height;
+				}
+				//uued mõõdud
+				$image_new_width=round($image_width/$photo_size_ratio);
+				$image_new_height=round($image_height/$photo_size_ratio);
+				//loon uue,uuete mõõtudega image objekti
+				$my_new_temp_image = imagecreatetruecolor($image_new_width,$image_new_height);
+				//kopeerime vajaliku pikslid suurelt kujutiselt väiksele
+				imagecopyresampled($my_new_temp_image,$my_temp_image,0,0,0,0,$image_new_width,$image_new_height,$image_width,$image_height);
+				//watermark
+				$watermark=imagecreatefrompng($watermark_dir);
+				$watermark_width=imagesx($watermark);
+				$watermark_height=imagesy($watermark);
+				$watermark_x = $image_new_width-$watermark_width-10;
+				$watermark_y = $image_new_height-$watermark_height-10;
+				imagecopy($my_new_temp_image,$watermark,$watermark_x,$watermark_y,0,0,$watermark_width,$watermark_height);
+				imagedestroy($watermark);
+				
+				//salvestame
+				$photo_submit_notice=save_image($my_new_temp_image, $file_type,$photo_upload_normal_dir .$file_name);
+				imagedestroy($my_new_temp_image);
+				
+				
+				
+				//Võin veel mõne suurusega teha
+				
+				imagedestroy($my_temp_image);
+						if(move_uploaded_file($_FILES["photo_input"]["tmp_name"], $photo_upload_orig_dir .$file_name)){
+							
+						}
+						else{
+							$photo_submit_notice="foto yleslaadimine ei onnestunud";
+						}
+			}
 		}
 		else{
 			$photo_submit_notice="Fotofail on valimata!";
