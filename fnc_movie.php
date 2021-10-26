@@ -1,5 +1,6 @@
 <?php
        $database = "if21_martin_lu";
+	   require_once ("fnc_general.php"); 
 	   function read_all_person_for_option($selected){
 		   $option_html=null;
 		   $conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
@@ -103,7 +104,7 @@
 			$film_html .= "<h3>" .$title_from_db ."</h3>";
 			$film_html .= "<ul>";
 			$film_html .= "<li>Valmimisaasta ". $year_from_db."</li>";
-			$film_html .= "<li>Kestus " .$length_from_db ."</li>";
+			$film_html .= "<li>Kestus " .duration_min_to_hour_and_min($length_from_db) ."</li>";
 			$film_html .= "<li>Zanr ". $genre_from_db."</li>";
 			$film_html .= "</ul> \n";
 		}

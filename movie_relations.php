@@ -32,7 +32,6 @@
 		if(empty($selected_person_for_relation)){
 			$person_in_movie_notice .= "Isik on valimata! ";
 		}
-	}
 		if(isset($_POST["person_in_movie_submit"])){
 		if(isset($_POST["movie_select"]) and !empty($_POST["movie_select"])){
 			$selected_movie_for_relation = filter_var($_POST["movie_select"], FILTER_VALIDATE_INT);
@@ -57,6 +56,8 @@
                 $person_in_movie_notice .= "Roll on kirja panemata! ";
             }
         }
+	}
+	
         
         if(empty($person_in_movie_notice)){
             $person_in_movie_notice = store_person_in_movie($selected_person_for_relation, $selected_movie_for_relation, $selected_position_for_relation, $role);
@@ -98,7 +99,6 @@
 		if(empty($selected_movie_for_relation)){
 			$genre_in_movie_notice .= "Film on valimata! ";
 		}
-	}
 		if(isset($_POST["genre_in_movie_submit"])){
 		if(isset($_POST["genre_select"]) and !empty($_POST["genre_select"])){
 			$selected_genre_for_relation = filter_var($_POST["genre_select"], FILTER_VALIDATE_INT);
@@ -107,9 +107,11 @@
 			$genre_in_movie_notice .= "Zanr on valimata! ";
 		}
 	}
-		if(empty($person_in_movie_notice)){
+		if(empty($genre_in_movie_notice)){
           $genre_in_movie_notice = store_genre_in_movie($selected_movie_for_relation, $selected_genre_for_relation);
         }
+	}
+		
 	require_once("page_header.php");
 ?>
 
