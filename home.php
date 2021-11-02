@@ -24,6 +24,7 @@ if(isset($_GET["logout"])){
 	<p><a href="movie_relations.php">Filmi info seoste loomine</a></p>
 	<p><a href="gallery_photo_upload.php">Fotode üleslaadimine</a></p>
 	<p><a href="gallery_public.php">Sisseloginud kasutajatele avalik galerii</a></p>
+	<p><a href="gallery_own.php">Minu omade fotode galerii</a></p>
 	<p><a href="?logout=1">Logi välja</a></p>
 
 </body>
