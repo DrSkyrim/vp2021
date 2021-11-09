@@ -106,4 +106,14 @@
 			imagedestroy($this->my_new_temp_image);
 			return $notice;
 		}
+		public function move_orig_file($target){
+			$photo_upload_notice=null;
+			if(move_uploaded_file($this->photo_to_upload["tmp_name"], $target)){
+                    $photo_upload_notice .= " Originaalfoto laeti üles!";
+                    //$photo_upload_notice = store_person_photo($file_name, $_POST["person_for_photo_input"]);
+                } else {
+                    $photo_upload_notice .= " Foto üleslaadimine ei õnnestunud!";
+                }
+			return $photo_upload_notice;
+		}
 	}
