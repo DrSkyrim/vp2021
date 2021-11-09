@@ -44,6 +44,7 @@
     } else {
         //tagasi eelmisena vaadatud lehele.
         //header("Location: home.php");
+		//header("Location: page.php");
     }
 	
     require("page_header.php");

@@ -111,7 +111,7 @@
 			//....
 			//</div>
 			$photo_html .= '<div class="thumbgallery">'."\n";
-			$photo_html .= '<a href="gallery_update.php?page=' . $id_from_db . '">';
+			$photo_html .= '<a href="gallery_update.php?photo=' . $id_from_db . '">';
 			$photo_html .= '<img src="'.$GLOBALS["photo_thumbnail_upload_dir"].$filename_from_db .'" alt="';
 			if(empty($alttext_from_db)){
 				$photo_html .= "Üleslaetud foto";
@@ -131,9 +131,9 @@
 		}
 	function read_own_photo($photo){
 		$photo_data = [];
-		$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
+		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
 		$conn->set_charset("utf8");
-        $stmt = $conn->prepare("SELECT filename, alttext, privacy FROM vp_photos WHERE id = ? AND userid = ? AND deleted IS NULL");
+        $stmt = $conn->prepare("SELECT filename, alttext, privacy FROM vpr_photos WHERE id = ? AND userid = ? AND deleted IS NULL");
 		echo $conn->error;
         $stmt->bind_param("ii", $photo, $_SESSION["user_id"]);
         $stmt->bind_result($filename_from_db, $alttext_from_db, $privacy_from_db);
@@ -153,9 +153,9 @@
 	
 	function photo_data_update($photo, $alttext, $privacy){
 		$notice = null;
-		$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
+		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
 		$conn->set_charset("utf8");
-        $stmt = $conn->prepare("UPDATE vp_photos SET alttext = ?, privacy = ? WHERE id = ? AND userid = ?");
+        $stmt = $conn->prepare("UPDATE vpr_photos SET alttext = ?, privacy = ? WHERE id = ? AND userid = ?");
 		echo $conn->error;
         $stmt->bind_param("siii", $alttext, $privacy, $photo, $_SESSION["user_id"]);
         if($stmt->execute()){
@@ -170,9 +170,9 @@
 	
 	function delete_photo($photo){
 		$notice = null;
-		$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
+		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
 		$conn->set_charset("utf8");
-        $stmt = $conn->prepare("UPDATE vp_photos SET deleted = NOW() WHERE id = ? AND userid = ?");
+        $stmt = $conn->prepare("UPDATE vpr_photos SET deleted = NOW() WHERE id = ? AND userid = ?");
 		echo $conn->error;
         $stmt->bind_param("ii", $photo, $_SESSION["user_id"]);
         if($stmt->execute()){
