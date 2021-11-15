@@ -29,30 +29,60 @@
     $privacy = 1;
     $photo_filename_prefix = "vpr_";
     $photo_upload_size_limit = 1024 * 1024;
+	$allowed_photo_types = ["image/jpeg", "image/png", "image/gif"];
     $photo_size_ratio = 1;
     
     if(isset($_POST["photo_submit"])){
         if(isset($_FILES["photo_input"]["tmp_name"]) and !empty($_FILES["photo_input"]["tmp_name"])){
             //kas on pilt ja mis tüüpi?
-            $image_check = getimagesize($_FILES["photo_input"]["tmp_name"]);
-            if($image_check !== false){
-                if($image_check["mime"] == "image/jpeg"){
-                    $file_type = "jpg";
-                }
-                if($image_check["mime"] == "image/png"){
-                    $file_type = "png";
-                }
-                if($image_check["mime"] == "image/gif"){
-                    $file_type = "gif";
-                }
-            } else {
-                $photo_error = "Valitud fail ei ole pilt!";
+            $photo_upload=new Photo_upload;
+			if(empty($photo_upload->error)){
+				//kas on lubatud tüüpi
+				$photo_error .= $photo_upload->check_alowed_type($allowed_photo_types);
+				
+				if(empty($photo_upload->error)){
+					//kas on lubatud suurusega
+					$photo_error .= $photo_upload->check_size($photo_upload_size_limit);
+					//kui seni vigu pole, laeme üles
+					if(empty($photo_error)){
+						//failinime
+						$photo_upload->create_filename($photo_filename_prefix);
+						//normaalmõõdus foto
+                //$my_new_temp_image = resize_photo($my_temp_image, $normal_photo_max_width, $normal_photo_max_height);
+                $photo_upload->resize_photo($normal_photo_max_width,$normal_photo_max_height);            
+                //lisan vesimärgi
+				
+				//$my_new_temp_image=add_watermark($my_new_temp_image, $watermark_file);
+                $photo_upload->add_watermark($watermark_file);
+                //salvestan
+                //$photo_upload_notice = "Vähendatud pildi " .save_image($my_new_temp_image, $file_type, $photo_normal_upload_dir .$file_name);
+				$photo_upload->save_image($photo_normal_upload_dir .$file_name);
+                //imagedestroy($my_new_temp_image);
+				//teen pisipildi
+				//$my_new_temp_image = resize_photo($my_temp_image, $thumbnail_width, $thumbnail_height, false);
+                //$photo_upload_notice .= " Pisipildi " .save_image($my_new_temp_image, $file_type, $photo_thumbnail_upload_dir .$file_name);
+                //imagedestroy($my_new_temp_image);
+				$photo_upload->resize_photo($thumbnail_width,$thumbnail_height);
+				$photo_upload->save_image($photo_thumbnail_upload_dir .$file_name);
+                
+                //kopeerime pildi originaalkujul, originaalnimega vajalikku kataloogi
+                $photo_upload_notice .= $photo_upload->move_orig_file($photo_orig_upload_dir .$file_name);
+				
+				$photo_upload_notice .= " " .store_photo_data($file_name, $alt_text, $privacy);
+				unset($photo_upload);
+				$alt_text = null;
+				$privacy = 1;
             }
-            
-            //Kas on lubatud suurusega?
-            if(empty($photo_error) and $_FILES["photo_input"]["size"] > $photo_upload_size_limit){
-                $photo_error .= "Valitud fail on liiga suur!";
-            }
+        } else {
+            $photo_error = "Pildifaili pole valitud!";
+						//kirjutame andmetabelisse
+						$photo_upload_notice .= " " .store_photo_data($photo_upload->file_name, $alt_text, $privacy);
+					}
+				}
+			} else {
+				$photo_error .= " " .$photo_upload->error;
+			}
+			unset($photo_upload);
             
             //kas alt tekst on
             if(isset($_POST["alt_input"]) and !empty($_POST["alt_input"])){
@@ -67,16 +97,6 @@
 			if(empty($privacy)){
 				$photo_error . " Privaatsus on määramata!";
 			}
-			
-            
-            if(empty($photo_error)){
-				//hakkan classi kasutama
-				$photo_upload= new Photo_upload($_FILES["photo_input"],$file_type);
-                //teen ajatempli
-                $time_stamp = microtime(1) * 10000;
-                
-                //moodustan failinime, kasutame eesliidet
-                $file_name = $photo_filename_prefix .$time_stamp ."." .$file_type;
                 
                 
                 
@@ -109,14 +129,13 @@
 				$alt_text = null;
 				$privacy = 1;
             }
-        } else {
+         else {
             $photo_error = "Pildifaili pole valitud!";
         }
         
         if(empty($photo_upload_notice)){
 			$photo_upload_notice = $photo_error;
 		}
-    }
     
     require("page_header.php");
 ?>
