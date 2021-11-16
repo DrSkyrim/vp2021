@@ -11,31 +11,46 @@
         header("Location: page.php");
     }
 	
-    require_once("../../config.php");
+	require_once("../../config.php");
 	require_once("fnc_photo_upload.php");
     require_once("fnc_general.php");
 	require_once("classes/Photo_upload.class.php");
     
     $photo_error = null;
     $photo_upload_notice = null;
+
     $normal_photo_max_width = 600;
     $normal_photo_max_height = 400;
-	$thumbnail_width = $thumbnail_height = 100;
-    $watermark_file = "Pics/vp_logo_w100_overlay.png";
+	$allowed_photo_types = ["image/jpeg", "image/png", "image/gif"];
+	$watermark_file = "Pics/vp_logo_w100_overlay.png";
     
     $file_type = null;
     $file_name = null;
     $alt_text = null;
     $privacy = 1;
-    $photo_filename_prefix = "vpr_";
+    $photo_filename_prefix = "vp_";
     $photo_upload_size_limit = 1024 * 1024;
-	$allowed_photo_types = ["image/jpeg", "image/png", "image/gif"];
+    $thumbnail_width = $thumbnail_height = 100;
     $photo_size_ratio = 1;
     
     if(isset($_POST["photo_submit"])){
+        //var_dump($_FILES["photo_input"]);
+		//kas alt tekst on
+		if(isset($_POST["alt_input"]) and !empty($_POST["alt_input"])){
+			$alt_text = test_input(filter_var($_POST["alt_input"], FILTER_SANITIZE_STRING));
+		}
+			
+		//kas on privaatsus
+		if(isset($_POST["privacy_input"]) and !empty($_POST["privacy_input"])){
+			$privacy = filter_var($_POST["privacy_input"], FILTER_VALIDATE_INT);
+		}
+		if(empty($privacy)){
+			$photo_error . " Privaatsus on määramata!";
+		}
+				
         if(isset($_FILES["photo_input"]["tmp_name"]) and !empty($_FILES["photo_input"]["tmp_name"])){
-            //kas on pilt ja mis tüüpi?
-            $photo_upload=new Photo_upload;
+						//fail on, klass kontrollib kohe, kas on foto
+			$photo_upload = new Photoupload($_FILES["photo_input"]);
 			if(empty($photo_upload->error)){
 				//kas on lubatud tüüpi
 				$photo_error .= $photo_upload->check_alowed_type($allowed_photo_types);
@@ -48,33 +63,15 @@
 						//failinime
 						$photo_upload->create_filename($photo_filename_prefix);
 						//normaalmõõdus foto
-                //$my_new_temp_image = resize_photo($my_temp_image, $normal_photo_max_width, $normal_photo_max_height);
-                $photo_upload->resize_photo($normal_photo_max_width,$normal_photo_max_height);            
-                //lisan vesimärgi
-				
-				//$my_new_temp_image=add_watermark($my_new_temp_image, $watermark_file);
-                $photo_upload->add_watermark($watermark_file);
-                //salvestan
-                //$photo_upload_notice = "Vähendatud pildi " .save_image($my_new_temp_image, $file_type, $photo_normal_upload_dir .$file_name);
-				$photo_upload->save_image($photo_normal_upload_dir .$file_name);
-                //imagedestroy($my_new_temp_image);
-				//teen pisipildi
-				//$my_new_temp_image = resize_photo($my_temp_image, $thumbnail_width, $thumbnail_height, false);
-                //$photo_upload_notice .= " Pisipildi " .save_image($my_new_temp_image, $file_type, $photo_thumbnail_upload_dir .$file_name);
-                //imagedestroy($my_new_temp_image);
-				$photo_upload->resize_photo($thumbnail_width,$thumbnail_height);
-				$photo_upload->save_image($photo_thumbnail_upload_dir .$file_name);
-                
-                //kopeerime pildi originaalkujul, originaalnimega vajalikku kataloogi
-                $photo_upload_notice .= $photo_upload->move_orig_file($photo_orig_upload_dir .$file_name);
-				
-				$photo_upload_notice .= " " .store_photo_data($file_name, $alt_text, $privacy);
-				unset($photo_upload);
-				$alt_text = null;
-				$privacy = 1;
-            }
-        } else {
-            $photo_error = "Pildifaili pole valitud!";
+						$photo_upload->resize_photo($normal_photo_max_width, $normal_photo_max_height);
+						$photo_upload->add_watermark($watermark_file);
+						$photo_upload_notice = "Vähendatud pildi " .$photo_upload->save_image($photo_normal_upload_dir .$photo_upload->file_name);
+						
+						//teen pisipildi
+						$photo_upload->resize_photo($thumbnail_width, $thumbnail_height);
+						$photo_upload_notice .= " Pisipildi " .$photo_upload->save_image($photo_thumbnail_upload_dir .$photo_upload->file_name);
+						//kopeerime pildi originaalkujul, originaalnimega vajalikku kataloogi
+						$photo_upload_notice .= $photo_upload->move_original($photo_orig_upload_dir .$photo_upload->file_name);
 						//kirjutame andmetabelisse
 						$photo_upload_notice .= " " .store_photo_data($photo_upload->file_name, $alt_text, $privacy);
 					}
@@ -83,60 +80,17 @@
 				$photo_error .= " " .$photo_upload->error;
 			}
 			unset($photo_upload);
-            
-            //kas alt tekst on
-            if(isset($_POST["alt_input"]) and !empty($_POST["alt_input"])){
-                $alt_text = test_input(filter_var($_POST["alt_input"], FILTER_SANITIZE_STRING));
-/*                 if(empty($alt_text)){
-                    $photo_error .= "Alternatiivtekst on lisamata!";
-                } */
-            }
-			if(isset($_POST["privacy_input"]) and !empty($_POST["privacy_input"])){
-				$privacy = filter_var($_POST["privacy_input"], FILTER_VALIDATE_INT);
-			}
-			if(empty($privacy)){
-				$photo_error . " Privaatsus on määramata!";
-			}
-                
-                
-                
-                //loome uue pikslikogumi
-                //$my_new_temp_image = resize_photo($my_temp_image, $normal_photo_max_width, $normal_photo_max_height);
-                $photo_upload->resize_photo($normal_photo_max_width,$normal_photo_max_height);            
-                //lisan vesimärgi
-				
-				//$my_new_temp_image=add_watermark($my_new_temp_image, $watermark_file);
-                $photo_upload->add_watermark($watermark_file);
-                //salvestan
-                //$photo_upload_notice = "Vähendatud pildi " .save_image($my_new_temp_image, $file_type, $photo_normal_upload_dir .$file_name);
-				$photo_upload->save_image($photo_normal_upload_dir .$file_name);
-                //imagedestroy($my_new_temp_image);
-				
-				//teen pisipildi
-				//$my_new_temp_image = resize_photo($my_temp_image, $thumbnail_width, $thumbnail_height, false);
-                //$photo_upload_notice .= " Pisipildi " .save_image($my_new_temp_image, $file_type, $photo_thumbnail_upload_dir .$file_name);
-                //imagedestroy($my_new_temp_image);
-				$photo_upload->resize_photo($thumbnail_width,$thumbnail_height);
-				$photo_upload->save_image($photo_thumbnail_upload_dir .$file_name);
-                
-                //imagedestroy($my_temp_image);
-                
-                //kopeerime pildi originaalkujul, originaalnimega vajalikku kataloogi
-                $photo_upload_notice .= $photo_upload->move_orig_file($photo_orig_upload_dir .$file_name);
-				
-				$photo_upload_notice .= " " .store_photo_data($file_name, $alt_text, $privacy);
-				unset($photo_upload);
-				$alt_text = null;
-				$privacy = 1;
-            }
-         else {
+			$alt_text = null;
+			$privacy = 1;
+        } else {
             $photo_error = "Pildifaili pole valitud!";
         }
         
         if(empty($photo_upload_notice)){
 			$photo_upload_notice = $photo_error;
 		}
-    
+    }
+    $to_head = '<script src="javascript/checkfilesize.js" defer></script>'."\n";
     require("page_header.php");
 ?>
 
@@ -166,7 +120,8 @@
         <input type="radio" name="privacy_input" id="privacy_input_3" value="3" <?php if($privacy == 3){echo " checked";} ?>>
         <label for="privacy_input_3">Avalik (kõik näevad)</label>
         <br>
-        <input type="submit" name="photo_submit" value="Lae pilt üles">
+        <input type="submit" name="photo_submit" id="photo_submit" value="Lae pilt üles">
+		<span id="notice">Vali pilt!</span>
     </form>
     <span><?php echo $photo_upload_notice; ?></span>
 </body>

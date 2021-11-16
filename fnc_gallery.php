@@ -31,16 +31,16 @@
 		$skip = ($page-1) * $limit;
 		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
 		$conn->set_charset("utf8");
-		$stmt = $conn->prepare("SELECT filename,alttext FROM vpr_photos WHERE privacy>=? AND deleted IS NULL ORDER BY id DESC LIMIT ?, ?");
+		$stmt = $conn->prepare("SELECT id,filename,alttext FROM vpr_photos WHERE privacy>=? AND deleted IS NULL ORDER BY id DESC LIMIT ?, ?");
 		//$stmt = $conn->prepare("SELECT filename,alttext FROM vpr_photos WHERE privacy>=? AND deleted IS NULL");
 		//$stmt = $conn->prepare("SELECT filename,alttext FROM vpr_photos WHERE privacy>=? AND deleted IS NULL ORDER BY id DESC");
 		echo $conn->error;
 		$stmt->bind_param("iii",$privacy,$skip,$limit);
-		$stmt->bind_result($filename_from_db,$alttext_from_db);
+		$stmt->bind_result($id_from_db, $filename_from_db,$alttext_from_db);
 		$stmt->execute();
 		while($stmt->fetch()){
 			//<div>
-			//<img src="kataloog/filename" alt="alttext">
+			//<img src="kataloog/filename" alt="alttext" data-id=x data-fn=failinimi.jpg>
 			//....
 			//</div>
 			$photo_html .= '<div class="thumbgallery">'."\n";
@@ -50,7 +50,7 @@
 			} else{
 				$photo_html .= $alttext_from_db;
 			}
-			$photo_html.='"class="thumbs">' ."\n";
+			$photo_html.='"class="thumbs" data-id="'.$id_from_db.'"data-fn"'.$filename_from_db.'">' ."\n";
 			$photo_html .= '</div>'."\n";
 		}
 		if(empty($photo_html)){
