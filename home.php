@@ -1,14 +1,5 @@
 <?php
-session_start();
-
-if(!isset($_SESSION["user_id"])){
-header("Location: page.php");}
-	$author_name = "Martin Lukas";
-	require_once ("fnc_user.php");
-if(isset($_GET["logout"])){
-	session_destroy();
-	header("Location: page.php");
-}
+	require_once("use_session.php");
 	//require_once("classes/Test.class.php");
 	//$test_object = new Test(27);
 	//echo $test_object->secret_number;
@@ -24,7 +15,8 @@ if(isset($_GET["logout"])){
 	} else {
 		$last_visitor= "<p>Küpsiseid pole, viimane külastaja teadmata</p> \n";
 	}
-	var_dump($_COOKIE);
+	
+	//var_dump($_COOKIE);
 	//cookie muutmine on lihtsalt uue väärtusega ümberkirjutamine
 	//Kustutamiseks kirjutatakse teda ümber aegumis tähtajaga mis on minevikus
 	//näiteks time()-3600
