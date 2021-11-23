@@ -4,7 +4,7 @@
     //kas on sisselogitud
     if(!isset($_SESSION["user_id"])){
         header("Location: page.php");
-    }
+    
     
     require_once("../../config.php");
     
@@ -41,3 +41,4 @@
 		$conn->close();
 	}
     echo $response;
+	}
