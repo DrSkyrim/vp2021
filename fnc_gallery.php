@@ -26,41 +26,50 @@
 		$conn->close();
 		return $photo_html;
 	}
-	function read_public_photo_thumbs($privacy, $page, $limit){
-		$photo_html=null;
-		$skip = ($page-1) * $limit;
-		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
+	 function read_public_photo_thumbs($privacy, $page, $limit){
+        $photo_html = null;
+        $skip = ($page - 1) * $limit;
+        $conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
 		$conn->set_charset("utf8");
-		$stmt = $conn->prepare("SELECT id,filename,alttext FROM vpr_photos WHERE privacy>=? AND deleted IS NULL ORDER BY id DESC LIMIT ?, ?");
-		//$stmt = $conn->prepare("SELECT filename,alttext FROM vpr_photos WHERE privacy>=? AND deleted IS NULL");
-		//$stmt = $conn->prepare("SELECT filename,alttext FROM vpr_photos WHERE privacy>=? AND deleted IS NULL ORDER BY id DESC");
+        //$stmt = $conn->prepare("SELECT id, filename, created, alttext FROM vpr_photos WHERE privacy >= ? AND deleted IS NULL ORDER BY id DESC LIMIT ?, ?");
+        $stmt = $conn->prepare("SELECT vpr_photos.id, filename, alttext, vpr_photos.created, firstname, lastname, AVG(rating) as AvgValue FROM vpr_photos JOIN vpr_users ON vpr_photos.userid = vpr_users.id LEFT JOIN vpr_photoratings ON vpr_photoratings.photoid = vpr_photos.id WHERE vpr_photos.privacy >= ? AND deleted IS NULL GROUP BY vpr_photos.id DESC LIMIT ?,?");
 		echo $conn->error;
-		$stmt->bind_param("iii",$privacy,$skip,$limit);
-		$stmt->bind_result($id_from_db, $filename_from_db,$alttext_from_db);
-		$stmt->execute();
-		while($stmt->fetch()){
-			//<div>
-			//<img src="kataloog/filename" alt="alttext" data-id=x data-fn=failinimi.jpg>
-			//....
-			//</div>
-			$photo_html .= '<div class="thumbgallery">'."\n";
-			$photo_html .= '<img src="'.$GLOBALS["photo_thumbnail_upload_dir"].$filename_from_db .'" alt="';
-			if(empty($alttext_from_db)){
-				$photo_html .= "Üleslaetud foto";
-			} else{
-				$photo_html .= $alttext_from_db;
+        $stmt->bind_param("iii", $privacy, $skip, $limit);
+        $stmt->bind_result($id_from_db, $filename_from_db, $alttext_from_db, $created_from_db, $firstname_from_db, $lastname_from_db, $avg_rating_from_db);
+        $stmt->execute();
+        while($stmt->fetch()){
+            //<div  class="thumbgallery">
+            //<img src="kataloog/filename" alt="alttekst" class="thumbs" data-id="x" data-fn="failinimi.jpg">
+            //....
+            //</div>
+            $photo_html .= '<div class="thumbgallery">' ."\n";
+            $photo_html .= '<img src="' .$GLOBALS["photo_thumbnail_upload_dir"] .$filename_from_db .'" alt="';
+            if(empty($alttext_from_db)){
+                $photo_html .= "Üleslaetud foto";
+            } else {
+                $photo_html .= $alttext_from_db;
+            }
+            $photo_html .= '" class="thumbs" data-id="' .$id_from_db .'" data-fn="' .$filename_from_db .'">' ."\n";
+            $photo_html .= "<p>" .$firstname_from_db ." " .$lastname_from_db ."<br> \n";
+			$photo_html .= "Lisatud: " .date_to_est_format($created_from_db) ."</p> \n";
+			$photo_html .= '<p id="rating' .$id_from_db .'">';
+			if(!empty($avg_rating_from_db)){
+				$photo_html .= "Hinne: " .round($avg_rating_from_db, 2);
+			} else {
+				$photo_html .= "Pole hinnatud";
 			}
-			$photo_html.='"class="thumbs" data-id="'.$id_from_db.'"data-fn"'.$filename_from_db.'">' ."\n";
-			$photo_html .= '</div>'."\n";
-		}
-		if(empty($photo_html)){
-			$photo_html = "<p>Kahjuks avalike fotosid üleslaetud ei ole</p> \n";
-		}
-		$stmt->close();
+			$photo_html .= "</p> \n";
+            $photo_html .= "</div> \n";
+        }
+        if(empty($photo_html)){
+            $photo_html = "<p>Kahjuks avalikke fotosid üles laetud pole!</p> \n";
+        }
+        $stmt->close();
 		$conn->close();
 		return $photo_html;
+    }
 			
-	}
+	
 	function count_public_photos($privacy){
 		$photo_count=0;
 		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);

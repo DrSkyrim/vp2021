@@ -14,7 +14,20 @@ if(isset($_GET["logout"])){
 	//echo $test_object->secret_number;
 	//echo "Avalik number on: " .$test_object->public_number;
 	//$test_object->reveal();
-	//unset($test_object);
+	//unset($test_object);'
+	
+	//cookie näide
+	setcookie("vp_visitor",$_SESSION["first_name"]." ".$_SESSION["last_name"],time()+(86400*9), "/~marluk/vp2021","greeny.cs.tlu.ee", isset($_SERVER["HTTPS"]), true);
+	$last_visitor = null;
+	if(isset($_COOKIE["vp_visitor"])){
+		$last_visitor= "<p>Viimati külastas lehte selles arvutis ".$_COOKIE["vp_visitor"]."</p> \n";
+	} else {
+		$last_visitor= "<p>Küpsiseid pole, viimane külastaja teadmata</p> \n";
+	}
+	var_dump($_COOKIE);
+	//cookie muutmine on lihtsalt uue väärtusega ümberkirjutamine
+	//Kustutamiseks kirjutatakse teda ümber aegumis tähtajaga mis on minevikus
+	//näiteks time()-3600
 	
 	require_once("page_header.php");
 
@@ -25,6 +38,8 @@ if(isset($_GET["logout"])){
 	<p>See leht on valminud õppetöö raames ja ei sisalda mingit tõsiseltvõetavat sisu!</p>
 	<p>Õppetöö toimub <a href="https://www.tlu.ee/dt">Tallinna Ülikooli Digitehnoloogiate instituudis</a>.</p>
 	<p>Oled sees.</p>
+	<hr><?php echo $last_visitor ?>
+	<hr>
 	<p><a href="listmovies.php">Filmide nimekiri</a></p>
 	<p><a href="addfilms.php">Filmide lisamine</a></p>
 	<p><a href="user_profile.php">Kasutaja Profiil</a></p>

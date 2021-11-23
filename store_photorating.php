@@ -9,27 +9,35 @@
     require_once("../../config.php");
     
     $database = "if21_martin_lu";
-    
-    $id = $_GET["photo"];
-    $rating = $_GET["rating"];
-    
-    $conn = new mysqli($server_host, $server_user_name, $server_password, $database);
-    $conn->set_charset("utf8");
-    $stmt = $conn->prepare("INSERT INTO vpr_photoratings (photoid, userid, rating) VALUES(?, ?, ?)");
-    echo $conn->error;
-    $stmt->bind_param("iii", $id, $_SESSION["user_id"], $rating);
-    $stmt->execute();
-    $stmt->close();
-    
-    //loeme keskmise hinde
-    $stmt = $conn->prepare("SELECT AVG(rating) as avgValue FROM vpr_photoratings WHERE photoid = ?");
-    echo $conn->error;
-    $stmt->bind_param("i", $id);
-    $stmt->bind_result($score);
-    $stmt->execute();
-    $stmt->fetch();
-    $stmt->close();
-    $conn->close();
-    echo round($score, 2);
-    
 	
+	if(isset($_GET["photo"]) and !empty($_GET["photo"])){
+		$id = filter_var($_GET["photo"], FILTER_VALIDATE_INT);
+	}
+	if(isset($_GET["rating"]) and !empty($_GET["rating"])){
+		$rating = filter_var($_GET["rating"], FILTER_VALIDATE_INT);
+	}
+	
+	$response = "Hinne teadmata!";
+	
+	if(!empty($id)){
+		$conn = new mysqli($GLOBALS["server_host"],$GLOBALS["sever_user_name"],$GLOBALS["server_password"],$GLOBALS["database"]);
+		$conn->set_charset("utf8");
+		if(!empty($rating)){
+			$stmt = $conn->prepare("INSERT INTO vpr_photoratings (photoid, userid, rating) VALUES(?, ?, ?)");
+			$stmt->bind_param("iii", $id, $_SESSION["user_id"], $rating);
+			$stmt->execute();
+			$stmt->close();
+		}
+		//loeme keskmise hinde
+		$stmt = $conn->prepare("SELECT AVG(rating) as avgValue FROM vpr_photoratings WHERE photoid = ?");
+		echo $conn->error;
+		$stmt->bind_param("i", $id);
+		$stmt->bind_result($score);
+		$stmt->execute();
+		if($stmt->fetch()){
+			$response = "Hinne: " .round($score, 2);
+		}
+		$stmt->close();
+		$conn->close();
+	}
+    echo $response;
